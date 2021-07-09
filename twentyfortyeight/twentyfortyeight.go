@@ -65,22 +65,53 @@ const (
 	Left  = iota
 )
 
-func (b *Board) move(direction direction) (ret *Board, moved bool) {
+func (d direction) String() string {
+	if d == Up {
+		return "Up"
+	} else if d == Down {
+		return "Down"
+	} else if d == Right {
+		return "Right"
+	} else if d == Left {
+		return "Left"
+	}
+	panic("unreachable")
+}
+
+func moveRight(line *[4]int8, moved *bool) {
+	target := 3
+	for j := 3; j >= 0; j-- {
+		if line[j] != 0 {
+			if target != j {
+				line[target] = line[j]
+				line[j] = 0
+				*moved = true
+			}
+			target--
+		}
+	}
+}
+
+func moveLeft(line *[4]int8, moved *bool) {
+	target := 0
+	for j := 0; j <= 3; j++ {
+
+		if line[j] != 0 {
+			if target != j {
+				line[target] = line[j]
+				line[j] = 0
+				*moved = true
+			}
+			target++
+		}
+	}
+}
+
+func (b *Board) Move(direction direction) (ret *Board, moved bool) {
 	ret = fromArray(b.B)
 	if direction == Right {
 		for i := range ret.B {
-			target := 3
-			// move everything to the right
-			for j := 3; j >= 0; j-- {
-				if ret.B[i][j] != 0 {
-					if target != j {
-						ret.B[i][target] = ret.B[i][j]
-						ret.B[i][j] = 0
-						moved = true
-					}
-					target--
-				}
-			}
+			moveRight(&ret.B[i], &moved)
 			needMove := false
 			// join adjacent
 			for j := 3; j > 0; j-- {
@@ -92,17 +123,25 @@ func (b *Board) move(direction direction) (ret *Board, moved bool) {
 			}
 			// if anything was joined, move to the right again
 			if needMove {
-				target := 3
-				for j := 3; j >= 0; j-- {
-					if ret.B[i][j] != 0 {
-						if target != j {
-							ret.B[i][target] = ret.B[i][j]
-							ret.B[i][j] = 0
-							moved = true
-						}
-						target--
-					}
+				moveRight(&ret.B[i], &moved)
+			}
+		}
+	}
+	if direction == Left {
+		for i := range ret.B {
+			moveLeft(&ret.B[i], &moved)
+			needMove := false
+			// join adjacent
+			for j := 0; j < 3; j++ {
+				if ret.B[i][j] == ret.B[i][j+1] {
+					ret.B[i][j] = ret.B[i][j] * 2
+					ret.B[i][j+1] = 0
+					needMove = true
 				}
+			}
+			// if anything was joined, move to the right again
+			if needMove {
+				moveLeft(&ret.B[i], &moved)
 			}
 		}
 	}

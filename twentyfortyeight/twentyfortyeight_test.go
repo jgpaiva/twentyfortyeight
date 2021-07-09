@@ -1,10 +1,28 @@
 package twentyfortyeight
 
 import (
+	"fmt"
 	"math/rand"
 	"testing"
 	"time"
 )
+
+func TestDirectionString(t *testing.T) {
+	directions := []struct {
+		val      direction
+		expected string
+	}{
+		{Right, "Right"},
+		{Left, "Left"},
+		{Up, "Up"},
+		{Down, "Down"},
+	}
+	for _, dir := range directions {
+		if res := fmt.Sprintf("%v", dir.val); res != dir.expected {
+			t.Errorf("fmt.Sprintf(\"%%v\", %v) got %v, expected %v", dir.val, res, dir.expected)
+		}
+	}
+}
 
 func TestNew(t *testing.T) {
 	b := New()
@@ -53,6 +71,20 @@ func TestMove(t *testing.T) {
 		},
 		{
 			fromArray([4][4]int8{
+				{0, 0, 0, 2},
+				{0, 2, 0, 4},
+				{16, 8, 4, 2},
+				{0, 2, 8, 0}}),
+			Left,
+			true,
+			fromArray([4][4]int8{
+				{2, 0, 0, 0},
+				{2, 4, 0, 0},
+				{16, 8, 4, 2},
+				{2, 8, 0, 0}}),
+		},
+		{
+			fromArray([4][4]int8{
 				{0, 0, 0, 0},
 				{0, 0, 0, 0},
 				{0, 0, 0, 0},
@@ -63,11 +95,31 @@ func TestMove(t *testing.T) {
 		},
 		{
 			fromArray([4][4]int8{
+				{0, 0, 0, 0},
+				{0, 0, 0, 0},
+				{0, 0, 0, 0},
+				{0, 0, 0, 0}}),
+			Left,
+			false,
+			nil,
+		},
+		{
+			fromArray([4][4]int8{
 				{0, 0, 0, 2},
 				{0, 0, 0, 4},
 				{0, 0, 0, 8},
 				{2, 4, 8, 16}}),
 			Right,
+			false,
+			nil,
+		},
+		{
+			fromArray([4][4]int8{
+				{2, 0, 0, 0},
+				{4, 0, 0, 0},
+				{8, 0, 0, 0},
+				{2, 4, 8, 16}}),
+			Left,
 			false,
 			nil,
 		},
@@ -84,14 +136,28 @@ func TestMove(t *testing.T) {
 				{0, 0, 0, 8},
 				{0, 0, 0, 16},
 				{0, 0, 8, 8}}),
+		},
+		{
+			fromArray([4][4]int8{
+				{0, 0, 2, 2},
+				{0, 4, 4, 0},
+				{2, 8, 0, 8},
+				{4, 4, 4, 4}}),
+			Left,
+			true,
+			fromArray([4][4]int8{
+				{4, 0, 0, 0},
+				{8, 0, 0, 0},
+				{2, 16, 0, 0},
+				{8, 8, 0, 0}}),
 		}}
 	for _, s := range s {
-		res, ok := s.b.move(s.direction)
+		res, ok := s.b.Move(s.direction)
 		if ok != s.expectedOk {
-			t.Errorf("move(Right) on:\n%v was %v, expected %v", s.b, ok, s.expectedOk)
+			t.Errorf("move(%v) on:\n%v OK was %v, expected %v", s.direction, s.b, ok, s.expectedOk)
 		}
 		if ok && s.expectedOk && res.B != s.expected.B {
-			t.Errorf("move(Right) on:\n%v returned:\n%v expected:\n%v", s.b, res, s.expected)
+			t.Errorf("move(%v) on:\n%v returned:\n%v expected:\n%v", s.direction, s.b, res, s.expected)
 		}
 	}
 }
