@@ -85,6 +85,20 @@ func TestMove(t *testing.T) {
 		},
 		{
 			fromArray([4][4]int8{
+				{2, 4, 2, 0},
+				{0, 0, 4, 8},
+				{0, 2, 8, 2},
+				{0, 0, 16, 0}}),
+			Down,
+			true,
+			fromArray([4][4]int8{
+				{0, 0, 2, 0},
+				{0, 0, 4, 0},
+				{0, 4, 8, 8},
+				{2, 2, 16, 2}}),
+		},
+		{
+			fromArray([4][4]int8{
 				{0, 0, 0, 0},
 				{0, 0, 0, 0},
 				{0, 0, 0, 0},
@@ -100,6 +114,16 @@ func TestMove(t *testing.T) {
 				{0, 0, 0, 0},
 				{0, 0, 0, 0}}),
 			Left,
+			false,
+			nil,
+		},
+		{
+			fromArray([4][4]int8{
+				{0, 0, 0, 0},
+				{0, 0, 0, 0},
+				{0, 0, 0, 0},
+				{0, 0, 0, 0}}),
+			Down,
 			false,
 			nil,
 		},
@@ -120,6 +144,16 @@ func TestMove(t *testing.T) {
 				{8, 0, 0, 0},
 				{2, 4, 8, 16}}),
 			Left,
+			false,
+			nil,
+		},
+		{
+			fromArray([4][4]int8{
+				{0, 0, 0, 18},
+				{0, 0, 0, 8},
+				{0, 0, 0, 4},
+				{2, 4, 8, 2}}),
+			Down,
 			false,
 			nil,
 		},
@@ -150,6 +184,20 @@ func TestMove(t *testing.T) {
 				{8, 0, 0, 0},
 				{2, 16, 0, 0},
 				{8, 8, 0, 0}}),
+		},
+		{
+			fromArray([4][4]int8{
+				{4, 2, 0, 0},
+				{4, 8, 4, 0},
+				{4, 0, 4, 2},
+				{4, 8, 0, 2}}),
+			Down,
+			true,
+			fromArray([4][4]int8{
+				{0, 0, 0, 0},
+				{0, 0, 0, 0},
+				{8, 2, 0, 0},
+				{8, 16, 8, 4}}),
 		}}
 	for _, s := range s {
 		res, ok := s.b.Move(s.direction)

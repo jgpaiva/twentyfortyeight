@@ -95,7 +95,6 @@ func moveRight(line *[4]int8, moved *bool) {
 func moveLeft(line *[4]int8, moved *bool) {
 	target := 0
 	for j := 0; j <= 3; j++ {
-
 		if line[j] != 0 {
 			if target != j {
 				line[target] = line[j]
@@ -103,6 +102,19 @@ func moveLeft(line *[4]int8, moved *bool) {
 				*moved = true
 			}
 			target++
+		}
+	}
+}
+func moveDown(b *[4][4]int8, moved *bool, i int) {
+	target := 3
+	for j := 3; j >= 0; j-- {
+		if b[j][i] != 0 {
+			if target != j {
+				b[target][i] = b[j][i]
+				b[j][i] = 0
+				*moved = true
+			}
+			target--
 		}
 	}
 }
@@ -121,7 +133,7 @@ func (b *Board) Move(direction direction) (ret *Board, moved bool) {
 					needMove = true
 				}
 			}
-			// if anything was joined, move to the right again
+			// if anything was joined, move right again
 			if needMove {
 				moveRight(&ret.B[i], &moved)
 			}
@@ -139,9 +151,27 @@ func (b *Board) Move(direction direction) (ret *Board, moved bool) {
 					needMove = true
 				}
 			}
-			// if anything was joined, move to the right again
+			// if anything was joined, move left again
 			if needMove {
 				moveLeft(&ret.B[i], &moved)
+			}
+		}
+	}
+	if direction == Down {
+		for i := range ret.B {
+			moveDown(&ret.B, &moved, i)
+			needMove := false
+			// join adjacent
+			for j := 3; j > 0; j-- {
+				if ret.B[j][i] == ret.B[j-1][i] {
+					ret.B[j][i] = ret.B[j][i] * 2
+					ret.B[j-1][i] = 0
+					needMove = true
+				}
+			}
+			// if anything was joined, move down again
+			if needMove {
+				moveDown(&ret.B, &moved, i)
 			}
 		}
 	}
