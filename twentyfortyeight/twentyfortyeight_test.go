@@ -56,49 +56,91 @@ func TestMove(t *testing.T) {
 		expected   *Board
 	}{
 		{
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{2, 0, 0, 0},
 				{2, 0, 4, 0},
 				{16, 8, 4, 2},
 				{0, 2, 8, 0}}),
 			Right,
 			true,
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{0, 0, 0, 2},
 				{0, 0, 2, 4},
 				{16, 8, 4, 2},
 				{0, 0, 2, 8}}),
 		},
 		{
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{0, 0, 0, 2},
 				{0, 2, 0, 4},
 				{16, 8, 4, 2},
 				{0, 2, 8, 0}}),
 			Left,
 			true,
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{2, 0, 0, 0},
 				{2, 4, 0, 0},
 				{16, 8, 4, 2},
 				{2, 8, 0, 0}}),
 		},
 		{
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{2, 4, 2, 0},
 				{0, 0, 4, 8},
 				{0, 2, 8, 2},
 				{0, 0, 16, 0}}),
 			Down,
 			true,
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{0, 0, 2, 0},
 				{0, 0, 4, 0},
 				{0, 4, 8, 8},
 				{2, 2, 16, 2}}),
 		},
 		{
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
+				{2, 0, 0, 0},
+				{2, 0, 0, 0},
+				{4, 2, 0, 0},
+				{8, 4, 0, 0}}),
+			Down,
+			true,
+			fromArray([4][4]int16{
+				{0, 0, 0, 0},
+				{4, 0, 0, 0},
+				{4, 2, 0, 0},
+				{8, 4, 0, 0}}),
+		},
+		{
+			fromArray([4][4]int16{
+				{0, 0, 2, 0},
+				{0, 4, 4, 8},
+				{0, 0, 8, 2},
+				{2, 2, 16, 0}}),
+			Up,
+			true,
+			fromArray([4][4]int16{
+				{2, 4, 2, 8},
+				{0, 2, 4, 2},
+				{0, 0, 8, 0},
+				{0, 0, 16, 0}}),
+		},
+		{
+			fromArray([4][4]int16{
+				{4, 16, 8, 0},
+				{64, 4, 0, 0},
+				{128, 2, 0, 0},
+				{256, 2, 0, 0}}),
+			Up,
+			true,
+			fromArray([4][4]int16{
+				{4, 16, 8, 0},
+				{64, 4, 0, 0},
+				{128, 4, 0, 0},
+				{256, 0, 0, 0}}),
+		},
+		{
+			fromArray([4][4]int16{
 				{0, 0, 0, 0},
 				{0, 0, 0, 0},
 				{0, 0, 0, 0},
@@ -108,7 +150,7 @@ func TestMove(t *testing.T) {
 			nil,
 		},
 		{
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{0, 0, 0, 0},
 				{0, 0, 0, 0},
 				{0, 0, 0, 0},
@@ -118,7 +160,7 @@ func TestMove(t *testing.T) {
 			nil,
 		},
 		{
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{0, 0, 0, 0},
 				{0, 0, 0, 0},
 				{0, 0, 0, 0},
@@ -128,7 +170,17 @@ func TestMove(t *testing.T) {
 			nil,
 		},
 		{
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
+				{0, 0, 0, 0},
+				{0, 0, 0, 0},
+				{0, 0, 0, 0},
+				{0, 0, 0, 0}}),
+			Up,
+			false,
+			nil,
+		},
+		{
+			fromArray([4][4]int16{
 				{0, 0, 0, 2},
 				{0, 0, 0, 4},
 				{0, 0, 0, 8},
@@ -138,7 +190,7 @@ func TestMove(t *testing.T) {
 			nil,
 		},
 		{
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{2, 0, 0, 0},
 				{4, 0, 0, 0},
 				{8, 0, 0, 0},
@@ -148,7 +200,7 @@ func TestMove(t *testing.T) {
 			nil,
 		},
 		{
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{0, 0, 0, 18},
 				{0, 0, 0, 8},
 				{0, 0, 0, 4},
@@ -158,46 +210,70 @@ func TestMove(t *testing.T) {
 			nil,
 		},
 		{
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
+				{2, 4, 8, 18},
+				{0, 0, 0, 8},
+				{0, 0, 0, 4},
+				{0, 0, 0, 2}}),
+			Up,
+			false,
+			nil,
+		},
+		{
+			fromArray([4][4]int16{
 				{2, 2, 0, 0},
 				{0, 4, 4, 0},
 				{0, 8, 0, 8},
 				{4, 4, 4, 4}}),
 			Right,
 			true,
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{0, 0, 0, 4},
 				{0, 0, 0, 8},
 				{0, 0, 0, 16},
 				{0, 0, 8, 8}}),
 		},
 		{
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{0, 0, 2, 2},
 				{0, 4, 4, 0},
 				{2, 8, 0, 8},
 				{4, 4, 4, 4}}),
 			Left,
 			true,
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{4, 0, 0, 0},
 				{8, 0, 0, 0},
 				{2, 16, 0, 0},
 				{8, 8, 0, 0}}),
 		},
 		{
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{4, 2, 0, 0},
 				{4, 8, 4, 0},
 				{4, 0, 4, 2},
 				{4, 8, 0, 2}}),
 			Down,
 			true,
-			fromArray([4][4]int8{
+			fromArray([4][4]int16{
 				{0, 0, 0, 0},
 				{0, 0, 0, 0},
 				{8, 2, 0, 0},
 				{8, 16, 8, 4}}),
+		},
+		{
+			fromArray([4][4]int16{
+				{4, 8, 0, 2},
+				{4, 8, 4, 2},
+				{4, 0, 4, 0},
+				{4, 2, 0, 0}}),
+			Up,
+			true,
+			fromArray([4][4]int16{
+				{8, 16, 8, 4},
+				{8, 2, 0, 0},
+				{0, 0, 0, 0},
+				{0, 0, 0, 0}}),
 		}}
 	for _, s := range s {
 		res, ok := s.b.Move(s.direction)

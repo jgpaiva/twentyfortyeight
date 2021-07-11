@@ -6,18 +6,18 @@ import (
 )
 
 type Board struct {
-	B    [4][4]int8
-	free int8
+	B    [4][4]int16
+	free int16
 }
 
 func New() Board {
 	b := Board{free: 16}
-	b = b.nextBoard()
-	b = b.nextBoard()
+	b = b.NextBoard()
+	b = b.NextBoard()
 	return b
 }
 
-func fromArray(b [4][4]int8) *Board {
+func fromArray(b [4][4]int16) *Board {
 	r := Board{B: b}
 	r.updateFree()
 	return &r
@@ -34,14 +34,14 @@ func (b *Board) updateFree() {
 	}
 }
 
-func (b *Board) nextBoard() Board {
-	spot := int8(rand.Intn(int(b.free)))
-	var value int8 = 2
+func (b *Board) NextBoard() Board {
+	spot := int16(rand.Intn(int(b.free)))
+	var value int16 = 2
 	// 4 is supposed to happen with probability 1/10
 	if rand.Intn(10) == 9 {
 		value = 4
 	}
-	var count int8
+	var count int16
 	for i, line := range b.B {
 		for j, item := range line {
 			if item == 0 {
@@ -78,7 +78,7 @@ func (d direction) String() string {
 	panic("unreachable")
 }
 
-func moveRight(line *[4]int8, moved *bool) {
+func moveRight(line *[4]int16, moved *bool) {
 	target := 3
 	for j := 3; j >= 0; j-- {
 		if line[j] != 0 {
@@ -92,7 +92,7 @@ func moveRight(line *[4]int8, moved *bool) {
 	}
 }
 
-func moveLeft(line *[4]int8, moved *bool) {
+func moveLeft(line *[4]int16, moved *bool) {
 	target := 0
 	for j := 0; j <= 3; j++ {
 		if line[j] != 0 {
@@ -105,7 +105,7 @@ func moveLeft(line *[4]int8, moved *bool) {
 		}
 	}
 }
-func moveDown(b *[4][4]int8, moved *bool, i int) {
+func moveDown(b *[4][4]int16, moved *bool, i int) {
 	target := 3
 	for j := 3; j >= 0; j-- {
 		if b[j][i] != 0 {
@@ -118,6 +118,19 @@ func moveDown(b *[4][4]int8, moved *bool, i int) {
 		}
 	}
 }
+func moveUp(b *[4][4]int16, moved *bool, i int) {
+	target := 0
+	for j := 0; j <= 3; j++ {
+		if b[j][i] != 0 {
+			if target != j {
+				b[target][i] = b[j][i]
+				b[j][i] = 0
+				*moved = true
+			}
+			target++
+		}
+	}
+}
 
 func (b *Board) Move(direction direction) (ret *Board, moved bool) {
 	ret = fromArray(b.B)
@@ -127,10 +140,12 @@ func (b *Board) Move(direction direction) (ret *Board, moved bool) {
 			needMove := false
 			// join adjacent
 			for j := 3; j > 0; j-- {
-				if ret.B[i][j] == ret.B[i][j-1] {
+				if ret.B[i][j] == ret.B[i][j-1] && ret.B[i][j] != 0 {
 					ret.B[i][j] = ret.B[i][j] * 2
 					ret.B[i][j-1] = 0
 					needMove = true
+					moved = true
+					ret.free++
 				}
 			}
 			// if anything was joined, move right again
@@ -145,10 +160,12 @@ func (b *Board) Move(direction direction) (ret *Board, moved bool) {
 			needMove := false
 			// join adjacent
 			for j := 0; j < 3; j++ {
-				if ret.B[i][j] == ret.B[i][j+1] {
+				if ret.B[i][j] == ret.B[i][j+1] && ret.B[i][j] != 0 {
 					ret.B[i][j] = ret.B[i][j] * 2
 					ret.B[i][j+1] = 0
 					needMove = true
+					moved = true
+					ret.free++
 				}
 			}
 			// if anything was joined, move left again
@@ -163,15 +180,37 @@ func (b *Board) Move(direction direction) (ret *Board, moved bool) {
 			needMove := false
 			// join adjacent
 			for j := 3; j > 0; j-- {
-				if ret.B[j][i] == ret.B[j-1][i] {
+				if ret.B[j][i] == ret.B[j-1][i] && ret.B[j][i] != 0 {
 					ret.B[j][i] = ret.B[j][i] * 2
 					ret.B[j-1][i] = 0
 					needMove = true
+					moved = true
+					ret.free++
 				}
 			}
 			// if anything was joined, move down again
 			if needMove {
 				moveDown(&ret.B, &moved, i)
+			}
+		}
+	}
+	if direction == Up {
+		for i := range ret.B {
+			moveUp(&ret.B, &moved, i)
+			needMove := false
+			// join adjacent
+			for j := 0; j < 3; j++ {
+				if ret.B[j][i] == ret.B[j+1][i] && ret.B[j][i] != 0 {
+					ret.B[j][i] = ret.B[j][i] * 2
+					ret.B[j+1][i] = 0
+					needMove = true
+					moved = true
+					ret.free++
+				}
+			}
+			// if anything was joined, move down again
+			if needMove {
+				moveUp(&ret.B, &moved, i)
 			}
 		}
 	}
