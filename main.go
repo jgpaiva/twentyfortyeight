@@ -8,15 +8,52 @@ import (
 	"os"
 	"time"
 
+	"github.com/fatih/color"
 	"jgpaiva.com/2048/twentyfortyeight"
 )
+
+func printBoard(b *twentyfortyeight.Board) (ret string) {
+	yellow := color.New(color.FgYellow).SprintFunc()
+	two := color.New(color.BgRed).SprintFunc()
+	four := color.New(color.BgGreen).SprintFunc()
+	eight := color.New(color.BgYellow).SprintFunc()
+	sixteen := color.New(color.BgBlue).SprintFunc()
+	thirtytwo := color.New(color.BgMagenta).SprintFunc()
+	sixtyfour := color.New(color.BgCyan).SprintFunc()
+	for _, line := range b.B {
+		for _, value := range line {
+			if value == 0 {
+				ret += yellow("    .")
+			} else {
+				ret += " "
+				if value == 2 {
+					ret += two(fmt.Sprintf("%4d", value))
+				} else if value == 4 {
+					ret += four(fmt.Sprintf("%4d", value))
+				} else if value == 8 {
+					ret += eight(fmt.Sprintf("%4d", value))
+				} else if value == 16 {
+					ret += sixteen(fmt.Sprintf("%4d", value))
+				} else if value == 32 {
+					ret += thirtytwo(fmt.Sprintf("%4d", value))
+				} else if value == 64 {
+					ret += sixtyfour(fmt.Sprintf("%4d", value))
+				} else {
+					ret += fmt.Sprintf("%4d", value)
+				}
+			}
+		}
+		ret += "\n"
+	}
+	return
+}
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Println("Welcome to 2048")
 	rand.Seed(time.Now().UTC().UnixNano())
 	b := twentyfortyeight.New()
-	fmt.Println(&b)
+	fmt.Println(printBoard(&b))
 	fmt.Print("> ")
 	for scanner.Scan() {
 		text := scanner.Text()
@@ -42,7 +79,7 @@ func main() {
 		if err := scanner.Err(); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(&b)
+		fmt.Println(printBoard(&b))
 		fmt.Print("> ")
 	}
 }

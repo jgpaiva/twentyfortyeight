@@ -221,9 +221,9 @@ func (b *Board) String() (ret string) {
 	for _, line := range b.B {
 		for _, value := range line {
 			if value == 0 {
-				ret += "   ."
+				ret += "    ."
 			} else {
-				ret += fmt.Sprintf("%4d", value)
+				ret += fmt.Sprintf("%5d", value)
 			}
 		}
 		ret += "\n"
